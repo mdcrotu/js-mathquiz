@@ -1,0 +1,73 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.keypad-container {
+    text-align: center;
+    width: 300px;
+}
+
+#display {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    text-align: right;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #fff;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.key {
+    padding: 20px;
+    font-size: 1.2rem;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.key:hover {
+    background-color: #0056b3;
+}
+
+#clear {
+    grid-column: span 2;
+    background-color: #DC3545;
+}
+
+#clear:hover {
+    background-color: #a71d2a;
+}
+
+#delete {
+    background-color: #FFC107;
+}
+
+#delete:hover {
+    background-color: #d39e00;
+}
+
+#toggle-sign {
+    background-color: #6c757d;
+    color: white;
+}
+
+#toggle-sign:hover {
+    background-color: #495057;
+}

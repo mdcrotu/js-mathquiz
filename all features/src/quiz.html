@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        #question {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+
+        #keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .key {
+            width: 60px;
+            height: 60px;
+            font-size: 1.2rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .key:hover {
+            background-color: #0056b3;
+        }
+
+        #display {
+            width: 200px;
+            height: 40px;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #submit {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #submit:hover {
+            background-color: #218838;
+        }
+
+        #feedback {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        #feedback.correct {
+            color: green;
+        }
+
+        #feedback.wrong {
+            color: red;
+        }
+
+        #scoreboard {
+            border: 2px solid #ccc;
+            padding: 10px;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            width: 200px;
+        }
+
+        #scoreboard h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        #scoreboard p {
+            margin: 5px 0;
+            font-size: 1.2rem;
+        }
+
+        #scoreboard span {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Math Quiz</h1>
+
+    <label for="difficulty">Select Difficulty:</label>
+    <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+    </select>
+
+    <div id="question">Loading...</div>
+
+    <input type="text" id="display" readonly />
+
+    <div id="keypad">
+        <button class="key">7</button>
+        <button class="key">8</button>
+        <button class="key">9</button>
+        <button class="key">4</button>
+        <button class="key">5</button>
+        <button class="key">6</button>
+        <button class="key">1</button>
+        <button class="key">2</button>
+        <button class="key">3</button>
+        <button class="key">0</button>
+        <button class="key">.</button>
+        <button class="key">+/-</button>
+    </div>
+
+    <button id="submit">Submit</button>
+
+    <div id="feedback"></div>
+
+    <div id="scoreboard">
+        <h2>Scoreboard</h2>
+        <p>Easy: <span id="easy-score">0</span></p>
+        <p>Medium: <span id="medium-score">0</span></p>
+        <p>Hard: <span id="hard-score">0</span></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const display = document.getElementById('display');
+            const questionEl = document.getElementById('question');
+            const feedbackEl = document.getElementById('feedback');
+            const submitButton = document.getElementById('submit');
+            const difficultySelect = document.getElementById('difficulty');
+            const keypad = document.getElementById('keypad');
+
+            const easyScoreEl = document.getElementById('easy-score');
+            const mediumScoreEl = document.getElementById('medium-score');
+            const hardScoreEl = document.getElementById('hard-score');
+
+            const scores = {
+                easy: 0,
+                medium: 0,
+                hard: 0,
+            };
+
+            const difficultyConfig = {
+                easy: { range: 10, operators: ['+', '-'] },
+                medium: { range: 50, operators: ['+', '-', '*', '/'] },
+                hard: { range: 100, operators: ['+', '-', '*', '/', '^', '√', '%'] },
+            };
+
+            let currentQuestion = {};
+
+            function generateQuestion() {
+                const difficulty = difficultySelect.value;
+                const { range, operators } = difficultyConfig[difficulty];
+                const operator = operators[Math.floor(Math.random() * operators.length)];
+
+                let num1, num2, answer;
+
+                if (operator === '^') {
+                    num1 = Math.floor(Math.random() * 10) + 1;
+                    num2 = Math.floor(Math.random() * 3) + 2;
+                    answer = Math.pow(num1, num2);
+                } else if (operator === '√') {
+                    answer = Math.floor(Math.random() * 10) + 1;
+                    num1 = answer * answer;
+                    num2 = '';
+                } else if (operator === '%') {
+                    num1 = Math.floor(Math.random() * range) + 1;
+                    num2 = Math.floor(Math.random() * (range - 1)) + 2;
+                    answer = num1 % num2;
+                } else {
+                    num1 = Math.floor(Math.random() * range) + 1;
+                    num2 = Math.floor(Math.random() * range) + 1;
+
+                    switch (operator) {
+                        case '+':
+                            answer = num1 + num2;
+                            break;
+                        case '-':
+                            answer = num1 - num2;
+                            break;
+                        case '*':
+                            answer = num1 * num2;
+                            break;
+                        case '/':
+                            answer = Math.round((num1 / num2) * 100) / 100;
+                            break;
+                    }
+                }
+
+                currentQuestion = { num1, num2, operator, answer };
+                questionEl.textContent = operator === '√'
+                    ? `√${num1} = ?`
+                    : `${num1} ${operator} ${num2} = ?`;
+                display.value = '';
+                feedbackEl.textContent = '';
+            }
+
+            generateQuestion();
+
+            keypad.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('key')) return;
+                const key = e.target.textContent;
+
+                if (key === '+/-') {
+                    if (display.value.startsWith('-')) {
+                        display.value = display.value.slice(1);
+                    } else {
+                        display.value = '-' + display.value;
+                    }
+                } else {
+                    display.value += key;
+                }
+            });
+
+            submitButton.addEventListener('click', () => {
+                const userAnswer = parseFloat(display.value);
+                const difficulty = difficultySelect.value;
+
+                if (isNaN(userAnswer)) {
+                    feedbackEl.textContent = 'Please enter a valid number.';
+                    return;
+                }
+
+                if (userAnswer === currentQuestion.answer) {
+                    scores[difficulty]++;
+                    feedbackEl.textContent = 'Correct! Well done.';
+                    feedbackEl.className = 'correct';
+                } else {
+                    feedbackEl.textContent = `Wrong! The correct answer was ${currentQuestion.answer}.`;
+                    feedbackEl.className = 'wrong';
+                }
+
+                easyScoreEl.textContent = scores.easy;
+                mediumScoreEl.textContent = scores.medium;
+                hardScoreEl.textContent = scores.hard;
+
+                setTimeout(generateQuestion, 2000);
+            });
+
+            difficultySelect.addEventListener('change', generateQuestion);
+        });
+    </script>
+</body>
+</html>
